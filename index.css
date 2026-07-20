@@ -1,0 +1,21 @@
+/* WIBE Custom Stylesheet */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #141313;
+    color: #e5e2e1;
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+/* Custom glow effects */
+.glow-text-lime {
+  text-shadow: 0 0 10px rgba(195, 244, 0, 0.5), 0 0 20px rgba(195, 244, 0, 0.2);
+}
+
+.glow-border-lime {
+  box-shadow: 0 0 15px rgba(195, 244, 0, 0.15);
+}

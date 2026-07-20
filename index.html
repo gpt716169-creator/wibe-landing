@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html class="dark" lang="ru">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>WIBE LOGISTICS | SHEIN Доставка в Россию</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet"/>
+    <!-- Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              secondary: "#ffffff",
+              "secondary-container": "#c3f400",
+              "on-secondary-fixed": "#161e00",
+              surface: "#141313",
+              "surface-variant": "#353434",
+              background: "#141313",
+              "on-surface": "#e5e2e1",
+              "on-surface-variant": "#c4c7c7",
+              "outline-variant": "#444748"
+            },
+            fontFamily: {
+              display: ["Syne", "sans-serif"],
+              mono: ["JetBrains Mono", "monospace"]
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+        body { 
+            background-color: #141313; 
+            color: #e5e2e1; 
+            overflow-x: hidden; 
+        }
+        .glass-card { 
+            background: rgba(20, 19, 19, 0.45); 
+            backdrop-filter: blur(24px); 
+            border: 1px solid rgba(195, 244, 0, 0.15); 
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            transition: border-color 0.8s cubic-bezier(0.16, 1, 0.3, 1), 
+                        box-shadow 0.8s cubic-bezier(0.16, 1, 0.3, 1), 
+                        background-color 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translate3d(0, 0, 0);
+            backface-visibility: hidden;
+            will-change: transform;
+        }
+        
+        /* Optimization for mobile touch screens to prevent GPU blur starvation and scroll lag */
+        @media (hover: none) and (pointer: coarse) {
+            .glass-card {
+                background: rgba(20, 19, 19, 0.85) !important;
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+            }
+            .card-highlight, .step-card-active {
+                background: rgba(20, 19, 19, 0.88) !important;
+            }
+        }
+        
+        .text-vertical { 
+            writing-mode: vertical-rl; 
+            transform: rotate(180deg); 
+        }
+        .acid-border { 
+            border-left: 4px solid #c3f400; 
+        }
+        .glow-hover:hover {
+            box-shadow: 0 0 25px rgba(195, 244, 0, 0.4);
+            border-color: #c3f400;
+        }
+        .card-highlight {
+            border-color: #c3f400 !important;
+            box-shadow: 0 0 15px rgba(195, 244, 0, 0.2) !important;
+            background: rgba(20, 19, 19, 0.45) !important;
+        }
+        .step-card-active {
+            border-color: #c3f400 !important;
+            box-shadow: 0 0 15px rgba(195, 244, 0, 0.2) !important;
+            background: rgba(20, 19, 19, 0.45) !important;
+        }
+        .scrollbar-none::-webkit-scrollbar { display: none; }
+        .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #141313; }
+        ::-webkit-scrollbar-thumb { background: #c3f400; }
+        
+        /* Preloader pulse effect */
+        @keyframes cyber-pulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 0.3; }
+        }
+        .pulse-text {
+            animation: cyber-pulse 2s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="font-mono selection:bg-secondary-container selection:text-on-secondary-fixed antialiased">
+
+<!-- Cyberpunk Preloader -->
+<div id="preloader" class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-surface transition-all duration-1000">
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(195,244,0,0.05),transparent_60%)]"></div>
+    <div class="relative z-10 text-center flex flex-col items-center gap-6 px-4 w-full">
+        <div class="font-display text-3xl xs:text-4xl sm:text-6xl font-black tracking-tighter text-on-surface flex items-center justify-center gap-2">
+            WIBE<span class="text-secondary-container">.</span>LOGISTICS
+        </div>
+        <div class="h-1 w-64 bg-surface-variant rounded-full overflow-hidden relative">
+            <div id="loader-bar" class="h-full bg-secondary-container w-0 transition-all duration-200"></div>
+        </div>
+        <div class="font-mono text-[10px] xs:text-xs tracking-wider sm:tracking-[0.2em] text-secondary-container flex flex-wrap gap-2 justify-center w-full px-2">
+            <span class="pulse-text text-center">// LOADING SYSTEM PROTOCOLS</span>
+            <span id="loader-percent">0%</span>
+        </div>
+    </div>
+</div>
+
+<!-- Header with CTA -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-4 sm:px-6 py-3.5 bg-surface/40 backdrop-blur-xl border-b border-outline-variant/10">
+    <div class="flex items-center gap-3">
+        <span class="material-symbols-outlined text-secondary-container animate-pulse">terminal</span>
+        <a href="#" class="font-display text-xl sm:text-2xl font-bold tracking-tighter text-on-surface">WIBE:RU</a>
+    </div>
+    <div class="flex items-center gap-3 sm:gap-6">
+        <div class="hidden md:flex items-center gap-4 text-xs tracking-wider opacity-60">
+            <span>SYS_STATUS: <span class="text-secondary-container">ONLINE</span></span>
+            <span>PING: 14MS</span>
+        </div>
+        <a href="https://t.me/sheinwibebot" target="_blank" class="bg-secondary-container hover:bg-secondary-container/90 text-on-secondary-fixed font-black text-xs py-2 px-3.5 sm:px-5 rounded-lg flex items-center gap-2 group transition-all active:scale-[0.98] shadow-[0_0_15px_rgba(195,244,0,0.35)]">
+            <span>ЗАПУСТИТЬ БОТА</span>
+            <span class="material-symbols-outlined text-sm group-hover:translate-x-0.5 transition-transform">send</span>
+        </a>
+    </div>
+</header>
+
+<!-- Background Canvas Container for Scroll Frame Control -->
+<div id="canvas-container" class="fixed top-0 left-0 w-full z-10 pointer-events-none flex items-center justify-center overflow-hidden" style="transform: translate3d(0, 0, 0); will-change: transform;">
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,0,0,0)_30%,rgba(20,19,19,0.8)_90%)] z-20"></div>
+    <canvas id="animation-canvas" class="w-full h-full max-w-[1280px] max-h-[1280px] object-contain opacity-0 transition-opacity duration-1000 z-10" style="transform: translate3d(0, 0, 0); will-change: transform; backface-visibility: hidden;"></canvas>
+</div>
+
+<!-- Scroll Container / Text Overlays -->
+<main class="relative z-30 min-h-screen">
+    
+    <!-- Title Screen (Scroll Step 1) -->
+    <section class="h-screen flex flex-col justify-end pb-20 sm:pb-24 px-6 sm:px-12 relative">
+        <div class="max-w-xl flex flex-col gap-5 sm:gap-6 relative z-30">
+            <div class="font-mono text-xs tracking-[0.22em] text-secondary-container uppercase">
+                // ЛУЧШИЙ СПОСОБ ЗАКАЗАТЬ SHEIN
+            </div>
+            <h1 class="font-display text-4xl sm:text-7xl font-extrabold leading-none tracking-tighter select-none">
+                БЕСПЛАТНАЯ<br>ДОСТАВКА<br><span class="text-secondary-container">ПО ВСЕЙ РОССИИ</span>
+            </h1>
+            <p class="font-mono text-xs sm:text-sm leading-relaxed text-on-surface-variant max-w-sm">
+                Официальный сервис доставки товаров с оригинального маркетплейса SHEIN. Выбирайте вещи на SHEIN и получайте посылки прямо в «Пятёрочке».
+            </p>
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mt-1">
+                <a href="https://t.me/sheinwibebot" target="_blank" class="bg-secondary-container hover:bg-secondary-container/90 text-on-secondary-fixed font-extrabold text-xs sm:text-sm py-3.5 px-6 rounded-lg flex items-center justify-center gap-3 shadow-[0_0_25px_rgba(195,244,0,0.4)] hover:shadow-[0_0_35px_rgba(195,244,0,0.7)] transition-all active:scale-[0.98] group">
+                    <span>ОФОРМИТЬ ЗАКАЗ В TELEGRAM</span>
+                    <span class="material-symbols-outlined text-base group-hover:translate-x-1 transition-transform">east</span>
+                </a>
+            </div>
+            <div class="flex items-center gap-3 text-secondary-container text-xs animate-bounce mt-2">
+                <span class="material-symbols-outlined">expand_more</span>
+                <span>ЛИСТАЙТЕ ВНИЗ</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stage 1 Screen (Scroll Step 2) -->
+    <section class="h-screen flex items-end sm:items-center justify-center sm:justify-start pb-12 sm:pb-0 px-4 sm:px-12 relative">
+        <div id="step-card-1" class="glass-card p-4 sm:p-8 rounded-lg w-full max-w-md acid-border transition-all duration-500">
+            <span class="text-[10px] sm:text-xs text-secondary-container tracking-widest font-bold block mb-1">// ШАГ 01: ВЫБОР</span>
+            <h2 class="font-display text-xl sm:text-3xl font-bold uppercase mb-2 text-on-surface">01. ВЫБИРАЙТЕ В SHEIN</h2>
+            <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed">
+                Откройте официальный сайт или приложение SHEIN и выберите любые понравившиеся вещи из миллионов доступных товаров.
+            </p>
+            <div class="mt-4">
+                <a href="https://t.me/sheinwibebot" target="_blank" class="w-full bg-secondary-container/15 border border-secondary-container/50 hover:bg-secondary-container hover:text-on-secondary-fixed text-secondary-container font-bold text-xs py-2.5 px-4 rounded flex items-center justify-between transition-all group">
+                    <span>ВЫБРАТЬ ВЕЩИ В SHEIN</span>
+                    <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">search</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stage 2 Screen (Scroll Step 3) -->
+    <section class="h-screen flex items-end sm:items-center justify-center sm:justify-end pb-12 sm:pb-0 px-4 sm:px-12 relative">
+        <div id="step-card-2" class="glass-card p-4 sm:p-8 rounded-lg w-full max-w-md acid-border transition-all duration-500">
+            <span class="text-[10px] sm:text-xs text-secondary-container tracking-widest font-bold block mb-1">// ШАГ 02: ОФОРМЛЕНИЕ</span>
+            <h2 class="font-display text-xl sm:text-3xl font-bold uppercase mb-2 text-on-surface">02. ОТПРАВЛЯЙТЕ НАМ</h2>
+            <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed">
+                Скопируйте ссылки на вещи и пришлите их в нашего Telegram-бота или приложение. Оплачивайте заказ любой картой РФ напрямую без лишних конвертаций.
+            </p>
+            <div class="mt-4">
+                <a href="https://t.me/sheinwibebot" target="_blank" class="w-full bg-secondary-container/15 border border-secondary-container/60 hover:bg-secondary-container hover:text-on-secondary-fixed text-secondary-container font-bold text-xs py-2.5 px-4 rounded flex items-center justify-between transition-all group">
+                    <span>ОТПРАВИТЬ ССЫЛКУ В БОТ</span>
+                    <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">send</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stage 3 Screen (Scroll Step 4) -->
+    <section class="h-screen flex items-end sm:items-center justify-center sm:justify-start pb-12 sm:pb-0 px-4 sm:px-12 relative">
+        <div id="step-card-3" class="glass-card p-4 sm:p-8 rounded-lg w-full max-w-md acid-border transition-all duration-500">
+            <span class="text-[10px] sm:text-xs text-secondary-container tracking-widest font-bold block mb-1">// ШАГ 03: ПОЛУЧЕНИЕ</span>
+            <h2 class="font-display text-xl sm:text-3xl font-bold uppercase mb-2 text-on-surface">03. ЗАБИРАЙТЕ В 5POST</h2>
+            <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed">
+                Забирайте посылку в удобном постамате или на кассе в магазинах «Пятёрочка» через службу 5Post. Вы можете отслеживать статус доставки 24/7.
+            </p>
+            <div class="mt-4">
+                <a href="https://t.me/sheinwibebot" target="_blank" class="w-full bg-secondary-container/15 border border-secondary-container/50 hover:bg-secondary-container hover:text-on-secondary-fixed text-secondary-container font-bold text-xs py-2.5 px-4 rounded flex items-center justify-between transition-all group">
+                    <span>ОТСЛЕЖИВАТЬ ПОСЫЛКУ</span>
+                    <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">local_shipping</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Us Title Transition Screen (Scroll Step 5) -->
+    <section id="advantages-section" class="h-screen flex items-center justify-center px-4 relative">
+        <div class="text-center z-30 glass-card p-8 sm:p-12 rounded-xl max-w-lg w-full flex flex-col items-center">
+            <span class="text-xs text-secondary-container tracking-[0.22em] font-bold block mb-2">// ADVANTAGES</span>
+            <h2 class="font-display text-4xl sm:text-6xl font-black uppercase text-on-surface mb-4">ПОЧЕМУ МЫ</h2>
+            <a href="https://t.me/sheinwibebot" target="_blank" class="inline-flex items-center gap-2 bg-secondary-container text-on-secondary-fixed font-black text-xs py-3.5 px-6 rounded-lg shadow-[0_0_20px_rgba(195,244,0,0.4)] hover:scale-105 transition-all mb-4">
+                <span>СДЕЛАЙТЕ ПЕРВЫЙ ЗАКАЗ</span>
+                <span class="material-symbols-outlined text-base">bolt</span>
+            </a>
+            <div class="flex items-center justify-center gap-2 text-secondary-container text-xs animate-bounce">
+                <span class="material-symbols-outlined">expand_more</span>
+                <span>УЗНАТЬ БОЛЬШЕ</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Us Screen (Scroll Step 6: Advantage 1) -->
+    <section class="h-screen flex items-end sm:items-center justify-center sm:justify-end pb-12 sm:pb-0 px-4 sm:px-12 relative">
+        <div id="adv-card-1" class="glass-card p-4 sm:p-8 rounded-lg w-full max-w-md acid-border transition-all duration-500">
+            <span class="text-[10px] sm:text-xs text-secondary-container tracking-widest font-bold block mb-1">// ПОЧЕМУ МЫ: 01</span>
+            <h2 class="font-display text-xl sm:text-3xl font-bold uppercase mb-2 text-on-surface">РЕФЕРАЛЬНАЯ СИСТЕМА</h2>
+            <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed">
+                Поделись ссылкой с друзьями. Получай 1% реальными рублями с каждого их заказа на свой баланс пожизненно. Выводи рубли напрямую на карту.
+            </p>
+            <div class="mt-4">
+                <a href="https://t.me/sheinwibebot" target="_blank" class="w-full bg-secondary-container/15 border border-secondary-container/50 hover:bg-secondary-container hover:text-on-secondary-fixed text-secondary-container font-bold text-xs py-2.5 px-4 rounded flex items-center justify-between transition-all group">
+                    <span>ПОЛУЧИТЬ РЕФЕРАЛЬНУЮ ССЫЛКУ</span>
+                    <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">person_add</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Us Screen (Scroll Step 7: Advantage 2) -->
+    <section class="h-screen flex items-end sm:items-center justify-center sm:justify-start pb-12 sm:pb-0 px-4 sm:px-12 relative">
+        <div id="adv-card-2" class="glass-card p-4 sm:p-8 rounded-lg w-full max-w-md acid-border transition-all duration-500">
+            <span class="text-[10px] sm:text-xs text-secondary-container tracking-widest font-bold block mb-1">// ПОЧЕМУ МЫ: 02</span>
+            <h2 class="font-display text-xl sm:text-3xl font-bold uppercase mb-2 text-on-surface">СОБСТВЕННЫЕ КУПОНЫ И 500₽</h2>
+            <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed">
+                Регулярно активируем и раздаем эксклюзивные купоны от сервиса. Всем новым клиентам дарим 500 рублей на баланс в боте при регистрации для первого заказа!
+            </p>
+            <div class="mt-4">
+                <a href="https://t.me/sheinwibebot" target="_blank" class="w-full bg-secondary-container/15 border border-secondary-container/60 hover:bg-secondary-container hover:text-on-secondary-fixed text-secondary-container font-bold text-xs py-2.5 px-4 rounded flex items-center justify-between transition-all group">
+                    <span>ПОЛУЧИТЬ 500₽ НА БАЛАНС</span>
+                    <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">card_giftcard</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Us Screen (Scroll Step 8: Advantage 3) -->
+    <section class="h-screen flex items-end sm:items-center justify-center sm:justify-end pb-12 sm:pb-0 px-4 sm:px-12 relative">
+        <div id="adv-card-3" class="glass-card p-4 sm:p-8 rounded-lg w-full max-w-md acid-border transition-all duration-500">
+            <span class="text-[10px] sm:text-xs text-secondary-container tracking-widest font-bold block mb-1">// ПОЧЕМУ МЫ: 03</span>
+            <h2 class="font-display text-xl sm:text-3xl font-bold uppercase mb-2 text-on-surface">СИСТЕМА УРОВНЕЙ</h2>
+            <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed">
+                Прокачивай статус своего аккаунта от Bronze до Diamond, получая повышенный кэшбек баллами за каждую покупку и копи персональные скидки.
+            </p>
+            <div class="mt-4">
+                <a href="https://t.me/sheinwibebot" target="_blank" class="w-full bg-secondary-container/15 border border-secondary-container/50 hover:bg-secondary-container hover:text-on-secondary-fixed text-secondary-container font-bold text-xs py-2.5 px-4 rounded flex items-center justify-between transition-all group">
+                    <span>УЗНАТЬ СВОЙ УРОВЕНЬ</span>
+                    <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">military_tech</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Us Screen (Scroll Step 9: Advantage 4) -->
+    <section class="h-screen flex items-end sm:items-center justify-center sm:justify-start pb-12 sm:pb-0 px-4 sm:px-12 relative">
+        <div id="adv-card-4" class="glass-card p-4 sm:p-8 rounded-lg w-full max-w-md acid-border transition-all duration-500">
+            <span class="text-[10px] sm:text-xs text-secondary-container tracking-widest font-bold block mb-1">// ПОЧЕМУ МЫ: 04</span>
+            <h2 class="font-display text-xl sm:text-3xl font-bold uppercase mb-2 text-on-surface">ВНУТРЕННИЙ МАГАЗИН</h2>
+            <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed">
+                Вещь не подошла по размеру или хотите выгодно обновить гардероб? Покупайте и продавайте вещи напрямую другим пользователям платформы внутри нашего бота.
+            </p>
+            <div class="mt-4">
+                <a href="https://t.me/sheinwibebot" target="_blank" class="w-full bg-secondary-container/15 border border-secondary-container/50 hover:bg-secondary-container hover:text-on-secondary-fixed text-secondary-container font-bold text-xs py-2.5 px-4 rounded flex items-center justify-between transition-all group">
+                    <span>ПЕРЕЙТИ В МАГАЗИН</span>
+                    <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">shopping_bag</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Us Screen (Scroll Step 10: Advantage 5) -->
+    <section class="h-screen flex items-end sm:items-center justify-center sm:justify-end pb-12 sm:pb-0 px-4 sm:px-12 relative">
+        <div id="adv-card-5" class="glass-card p-4 sm:p-8 rounded-lg w-full max-w-md acid-border transition-all duration-500">
+            <span class="text-[10px] sm:text-xs text-secondary-container tracking-widest font-bold block mb-1">// ПОЧЕМУ МЫ: 05</span>
+            <h2 class="font-display text-xl sm:text-3xl font-bold uppercase mb-2 text-on-surface">МГНОВЕННЫЙ САППОРТ</h2>
+            <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed">
+                Живая служба заботы на связи прямо в чате бота 24/7. Ответ на любой вопрос по логистике, размерам или таможенному оформлению за 2 минуты.
+            </p>
+            <div class="mt-4">
+                <a href="https://t.me/sheinwibebot" target="_blank" class="w-full bg-secondary-container/15 border border-secondary-container/50 hover:bg-secondary-container hover:text-on-secondary-fixed text-secondary-container font-bold text-xs py-2.5 px-4 rounded flex items-center justify-between transition-all group">
+                    <span>НАПИСАТЬ В ПОДДЕРЖКУ</span>
+                    <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">headset_mic</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Us Screen (Scroll Step 11: Advantage 6) -->
+    <section class="h-screen flex items-end sm:items-center justify-center sm:justify-start pb-12 sm:pb-0 px-4 sm:px-12 relative">
+        <div id="adv-card-6" class="glass-card p-4 sm:p-8 rounded-lg w-full max-w-md acid-border transition-all duration-500">
+            <span class="text-[10px] sm:text-xs text-secondary-container tracking-widest font-bold block mb-1">// ПОЧЕМУ МЫ: 06</span>
+            <h2 class="font-display text-xl sm:text-3xl font-bold uppercase mb-2 text-on-surface">ПОДАРКИ ПОДРУГАМ</h2>
+            <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed">
+                Оформляй заказы прямо на адрес подруги. Мы бережно упакуем посылку в праздничную обертку и пришлем ей красивое уведомление.
+            </p>
+            <div class="mt-4">
+                <a href="https://t.me/sheinwibebot" target="_blank" class="w-full bg-secondary-container/15 border border-secondary-container/50 hover:bg-secondary-container hover:text-on-secondary-fixed text-secondary-container font-bold text-xs py-2.5 px-4 rounded flex items-center justify-between transition-all group">
+                    <span>ОФОРМИТЬ ПОДАРОК ПОДРУГЕ</span>
+                    <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">redeem</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final Bento Grid & CTA Screen (Scroll Step 12) -->
+    <section class="min-h-screen py-32 px-6 sm:px-12 flex flex-col justify-center relative">
+        <div class="max-w-4xl mx-auto w-full flex flex-col gap-12 relative z-30">
+            
+            <div class="text-center sm:text-left">
+                <span class="text-xs text-secondary-container tracking-[0.2em] font-bold block mb-2">// PROCESS COMPLETED</span>
+                <h2 class="font-display text-4xl sm:text-6xl font-black uppercase tracking-tight text-on-surface">WIBE ДОСТАВКА</h2>
+            </div>
+            
+            <!-- Feature Bento Grid -->
+            <div class="flex flex-col sm:grid sm:grid-cols-3 gap-y-[45vh] sm:gap-6 w-full mt-6 sm:mt-0">
+                <!-- Large Highlight Card -->
+                <div id="bento-card-1" class="col-span-1 sm:col-span-3 glass-card p-8 rounded-lg flex flex-col justify-between min-h-[200px] sm:min-h-[220px] relative overflow-hidden group transition-all duration-500 mb-[5vh] sm:mb-0">
+                    <div class="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,rgba(195,244,0,0.1),transparent_50%)]"></div>
+                    <div class="relative z-10 flex flex-col gap-4">
+                        <span class="material-symbols-outlined text-secondary-container text-4xl">flight_takeoff</span>
+                        <h3 class="font-display text-2xl font-bold tracking-tight text-on-surface">БЕСПЛАТНАЯ ДОСТАВКА SHEIN В РФ</h3>
+                        <p class="text-sm text-on-surface-variant max-w-xl leading-relaxed">
+                            Забудьте о сложных схемах заказа и посредниках. Мы берем на себя всю логистику, таможенное оформление и пересылку в Россию. Для вас доставка абсолютно бесплатна!
+                        </p>
+                        <a href="https://t.me/sheinwibebot" target="_blank" class="inline-flex items-center gap-2 bg-secondary-container text-on-secondary-fixed font-black text-xs py-2.5 px-5 rounded-lg w-fit mt-2 shadow-[0_0_15px_rgba(195,244,0,0.3)] hover:scale-105 transition-all">
+                            <span>ОФОРМИТЬ БЕСПЛАТНУЮ ДОСТАВКУ</span>
+                            <span class="material-symbols-outlined text-sm">east</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Bento Info Card 1 -->
+                <div id="bento-card-2" class="glass-card p-6 rounded-lg flex flex-col justify-between h-52 transition-all duration-500 mb-[5vh] sm:mb-0">
+                    <span class="material-symbols-outlined text-secondary-container text-3xl">credit_card</span>
+                    <div>
+                        <h4 class="font-display text-lg font-bold text-on-surface uppercase mb-1">ОПЛАТА КАРТАМИ РФ</h4>
+                        <p class="text-xs text-on-surface-variant">Принимаем любые российские карты, включая МИР, Visa и Mastercard для оплаты ваших заказов.</p>
+                        <a href="https://t.me/sheinwibebot" target="_blank" class="mt-3 w-full bg-secondary-container/15 border border-secondary-container/40 hover:bg-secondary-container hover:text-on-secondary-fixed text-secondary-container font-bold text-[11px] py-1.5 px-3 rounded flex items-center justify-between transition-all group">
+                            <span>ОПЛАТИТЬ КАРТОЙ РФ</span>
+                            <span class="material-symbols-outlined text-xs group-hover:translate-x-0.5 transition-transform">credit_card</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Bento Info Card 2 -->
+                <div id="bento-card-3" class="glass-card p-6 rounded-lg flex flex-col justify-between h-52 transition-all duration-500 mb-[5vh] sm:mb-0">
+                    <span class="material-symbols-outlined text-secondary-container text-3xl">query_stats</span>
+                    <div>
+                        <h4 class="font-display text-lg font-bold text-on-surface uppercase mb-1">ОТСЛЕЖИВАНИЕ 24/7</h4>
+                        <p class="text-xs text-on-surface-variant">Контролируйте перемещение вашей посылки от склада SHEIN до ячейки постамата в реальном времени.</p>
+                        <a href="https://t.me/sheinwibebot" target="_blank" class="mt-3 w-full bg-secondary-container/15 border border-secondary-container/40 hover:bg-secondary-container hover:text-on-secondary-fixed text-secondary-container font-bold text-[11px] py-1.5 px-3 rounded flex items-center justify-between transition-all group">
+                            <span>ПРОВЕРИТЬ СТАТУС</span>
+                            <span class="material-symbols-outlined text-xs group-hover:translate-x-0.5 transition-transform">radar</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Bento CTA Card (Telegram Join) -->
+                <div id="bento-card-4" class="glass-card p-6 rounded-lg flex flex-col justify-between h-52 bg-gradient-to-br from-surface to-secondary-container/10 border border-secondary-container/40 transition-all duration-500">
+                    <span class="material-symbols-outlined text-secondary-container text-3xl animate-pulse">send</span>
+                    <div>
+                        <h4 class="font-display text-lg font-bold text-on-surface uppercase mb-2">НАШ TELEGRAM-БОТ</h4>
+                        <a href="https://t.me/sheinwibebot" target="_blank" id="cta-button" class="w-full bg-secondary-container text-on-secondary-fixed font-bold text-xs py-3 px-4 rounded flex items-center justify-between group transition-all active:scale-[0.98] shadow-[0_0_15px_rgba(195,244,0,0.3)]">
+                            ЗАКАЗАТЬ В БОТЕ
+                            <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">north_east</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Meta Info -->
+            <footer class="flex flex-col sm:flex-row justify-between items-center gap-4 border-t border-outline-variant/10 pt-8 opacity-40 text-xs">
+                <p>©2026 SHEIN_RU CONCIERGE. POWERED BY WIBE.</p>
+                <div class="flex gap-6">
+                    <a href="#" class="hover:text-secondary-container transition-colors">SECURITY PROTOCOL</a>
+                    <a href="#" class="hover:text-secondary-container transition-colors">TERMS OF USE</a>
+                </div>
+            </footer>
+        </div>
+    </section>
+
+</main>
+
+<!-- Mobile Floating Sticky CTA Bar -->
+<div class="fixed bottom-4 left-4 right-4 sm:hidden z-50 pointer-events-auto">
+    <a href="https://t.me/sheinwibebot" target="_blank" class="w-full bg-secondary-container text-on-secondary-fixed font-black text-xs py-3.5 px-5 rounded-xl flex items-center justify-between shadow-[0_8px_30px_rgba(195,244,0,0.6)] border border-secondary-container active:scale-[0.97] transition-transform">
+        <span class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-base">smart_toy</span>
+            <span>ЗАКАЗАТЬ В TELEGRAM-БОТЕ</span>
+        </span>
+        <span class="material-symbols-outlined text-base">arrow_forward</span>
+    </a>
+</div>
+
+<!-- Custom JS Core logic -->
+<script src="main.js"></script>
+</body>
+</html>
